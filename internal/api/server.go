@@ -261,10 +261,7 @@ func NewServer(cfg *config.Config, authManager *auth.Manager, accessManager *sdk
 	if optionState.localPassword != "" {
 		s.mgmt.SetLocalPassword(optionState.localPassword)
 	}
-	logDir := filepath.Join(s.currentPath, "logs")
-	if base := util.WritablePath(); base != "" {
-		logDir = filepath.Join(base, "logs")
-	}
+	logDir := logging.ResolveLogDirectory(cfg)
 	s.mgmt.SetLogDirectory(logDir)
 	s.localPassword = optionState.localPassword
 
@@ -613,6 +610,7 @@ func (s *Server) registerManagementRoutes() {
 		mgmt.GET("/auth-files/download", s.mgmt.DownloadAuthFile)
 		mgmt.POST("/auth-files", s.mgmt.UploadAuthFile)
 		mgmt.DELETE("/auth-files", s.mgmt.DeleteAuthFile)
+		mgmt.PATCH("/auth-files/status", s.mgmt.PatchAuthFileStatus)
 		mgmt.POST("/vertex/import", s.mgmt.ImportVertexCredential)
 
 		mgmt.GET("/anthropic-auth-url", s.mgmt.RequestAnthropicToken)
